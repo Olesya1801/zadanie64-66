@@ -1,0 +1,506 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GameSave — покупай игры дешевле</title>
+    <style>
+        /* ===== ОБЩИЕ СТИЛИ ===== */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, sans-serif;
+        }
+
+        body {
+            background-color: #0f0f14;
+            color: #eaeaea;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        a {
+            color: #4fc3f7;
+            text-decoration: none;
+        }
+
+        /* ===== ШАПКА ===== */
+        header {
+            background-color: #1a1a24;
+            padding: 15px 40px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .logo {
+            font-size: 24px;
+            font-weight: bold;
+            color: #4fc3f7;
+            letter-spacing: 1px;
+        }
+
+        .logo span {
+            color: #ffb74d;
+        }
+
+        .search-bar {
+            flex: 1;
+            max-width: 500px;
+            margin: 0 30px;
+            position: relative;
+        }
+
+        .search-bar input {
+            width: 100%;
+            padding: 10px 40px 10px 15px;
+            border-radius: 8px;
+            border: 1px solid #333;
+            background-color: #0f0f14;
+            color: #eaeaea;
+            font-size: 14px;
+            outline: none;
+            transition: 0.3s;
+        }
+
+        .search-bar input:focus {
+            border-color: #4fc3f7;
+            box-shadow: 0 0 8px rgba(79, 195, 247, 0.5);
+        }
+
+        .search-bar::after {
+            content: "🔍";
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            opacity: 0.5;
+            pointer-events: none;
+        }
+
+        .user-actions {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+
+        .btn-login {
+            padding: 8px 18px;
+            background-color: transparent;
+            border: 1px solid #4fc3f7;
+            color: #4fc3f7;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: 0.3s;
+            font-size: 14px;
+        }
+
+        .btn-login:hover {
+            background-color: #4fc3f7;
+            color: #0f0f14;
+        }
+
+        .btn-register {
+            padding: 8px 18px;
+            background-color: #4fc3f7;
+            border: none;
+            color: #0f0f14;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: 0.3s;
+            font-weight: bold;
+            font-size: 14px;
+        }
+
+        .btn-register:hover {
+            background-color: #29b6f6;
+        }
+
+        /* ===== ОСНОВНОЙ КОНТЕНТ ===== */
+        main {
+            flex: 1;
+            padding: 40px;
+            max-width: 1400px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        .hero {
+            text-align: center;
+            margin-bottom: 50px;
+        }
+
+        .hero h1 {
+            font-size: 36px;
+            margin-bottom: 15px;
+            background: linear-gradient(90deg, #4fc3f7, #ffb74d);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .hero p {
+            font-size: 16px;
+            color: #aaa;
+        }
+
+        .section-title {
+            font-size: 22px;
+            margin-bottom: 20px;
+            padding-left: 10px;
+            border-left: 4px solid #4fc3f7;
+        }
+
+        /* ===== СЕТКА КАРТОЧЕК ИГР ===== */
+        .games-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+            gap: 20px;
+            margin-bottom: 50px;
+        }
+
+        .game-card {
+            background-color: #1a1a24;
+            border-radius: 12px;
+            overflow: hidden;
+            transition: transform 0.3s, box-shadow 0.3s;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .game-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(79, 195, 247, 0.3);
+        }
+
+        .game-cover {
+            height: 130px;
+            background: linear-gradient(135deg, #2a2a3a, #3a3a5a);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 50px;
+            color: #4fc3f7;
+            position: relative;
+        }
+
+        .discount-badge {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background-color: #ff5252;
+            color: white;
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: 13px;
+            font-weight: bold;
+        }
+
+        .game-info {
+            padding: 15px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .game-title {
+            font-size: 15px;
+            margin-bottom: 8px;
+            font-weight: 600;
+            min-height: 40px;
+        }
+
+        .game-prices {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+
+        .old-price {
+            text-decoration: line-through;
+            color: #777;
+            font-size: 13px;
+        }
+
+        .new-price {
+            color: #4caf50;
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        .cashback {
+            font-size: 12px;
+            color: #ffb74d;
+            margin-bottom: 10px;
+        }
+
+        .btn-wishlist {
+            padding: 8px;
+            background-color: #2a2a3a;
+            border: none;
+            color: #eaeaea;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 13px;
+            transition: 0.3s;
+            width: 100%;
+        }
+
+        .btn-wishlist:hover {
+            background-color: #4fc3f7;
+            color: #0f0f14;
+        }
+
+        .btn-wishlist.added {
+            background-color: #4caf50;
+            color: white;
+        }
+
+        /* ===== ФУТЕР ===== */
+        footer {
+            background-color: #1a1a24;
+            padding: 30px 40px;
+            text-align: center;
+            color: #888;
+            font-size: 14px;
+            border-top: 1px solid #2a2a3a;
+        }
+
+        footer a {
+            margin: 0 10px;
+        }
+
+        /* ===== АДАПТИВНОСТЬ ===== */
+        @media (max-width: 768px) {
+            header {
+                flex-direction: column;
+                gap: 15px;
+                padding: 15px 20px;
+            }
+
+            .search-bar {
+                margin: 0;
+                width: 100%;
+                max-width: 100%;
+            }
+
+            main {
+                padding: 20px;
+            }
+
+            .hero h1 {
+                font-size: 26px;
+            }
+
+            .games-grid {
+                grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+                gap: 12px;
+            }
+
+            .game-cover {
+                height: 100px;
+                font-size: 36px;
+            }
+        }
+
+        /* ===== УВЕДОМЛЕНИЕ ===== */
+        .toast {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background-color: #4caf50;
+            color: white;
+            padding: 15px 25px;
+            border-radius: 8px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.5);
+            opacity: 0;
+            transform: translateY(20px);
+            transition: 0.3s;
+            pointer-events: none;
+            z-index: 1000;
+        }
+
+        .toast.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ===== ШАПКА ===== -->
+    <header>
+        <div class="logo">Game<span>Save</span></div>
+
+        <div class="search-bar">
+            <input type="text" id="searchInput" placeholder="Найти игру...">
+        </div>
+
+        <div class="user-actions">
+            <button class="btn-login" onclick="alert('Страница входа в разработке')">Войти</button>
+            <button class="btn-register" onclick="alert('Страница регистрации в разработке')">Регистрация</button>
+        </div>
+    </header>
+
+    <!-- ===== ОСНОВНОЙ КОНТЕНТ ===== -->
+    <main>
+        <div class="hero">
+            <h1>Покупай игры дешевле</h1>
+            <p>Сравниваем цены из 15+ магазинов и маркетплейсов. Получай кешбэк до 10% с каждой покупки.</p>
+        </div>
+
+        <h2 class="section-title">🔥 Лучшие скидки дня</h2>
+        <div class="games-grid" id="gamesGrid">
+            <!-- Карточки будут добавлены через JavaScript -->
+        </div>
+
+        <h2 class="section-title">🎮 Популярные игры</h2>
+        <div class="games-grid" id="popularGrid">
+            <!-- Карточки будут добавлены через JavaScript -->
+        </div>
+    </main>
+
+    <!-- ===== ФУТЕР ===== -->
+    <footer>
+        <p>© 2026 GameSave. Все права защищены.</p>
+        <p>
+            <a href="#">О проекте</a> |
+            <a href="#">Поддержка</a> |
+            <a href="#">Политика конфиденциальности</a>
+        </p>
+    </footer>
+
+    <!-- ===== ВСПЛЫВАЮЩЕЕ УВЕДОМЛЕНИЕ ===== -->
+    <div class="toast" id="toast">Игра добавлена в список желаемого</div>
+
+    <script>
+        // ===== ДАННЫЕ ДЛЯ ДЕМОНСТРАЦИИ =====
+        // В реальном проекте эти данные приходят с сервера (API)
+        const games = [
+            { id: 1, title: "Cyberpunk 2077", oldPrice: 2999, newPrice: 899, discount: 70, cashback: 5, emoji: "🤖", popular: true },
+            { id: 2, title: "The Witcher 3: Wild Hunt", oldPrice: 1999, newPrice: 399, discount: 80, cashback: 7, emoji: "🐺", popular: true },
+            { id: 3, title: "Red Dead Redemption 2", oldPrice: 3999, newPrice: 1599, discount: 60, cashback: 5, emoji: "🤠", popular: true },
+            { id: 4, title: "Elden Ring", oldPrice: 3999, newPrice: 2399, discount: 40, cashback: 3, emoji: "⚔️", popular: true },
+            { id: 5, title: "Hades", oldPrice: 999, newPrice: 349, discount: 65, cashback: 10, emoji: "🔥", popular: false },
+            { id: 6, title: "Stardew Valley", oldPrice: 499, newPrice: 199, discount: 60, cashback: 8, emoji: "🌾", popular: true },
+            { id: 7, title: "Hollow Knight", oldPrice: 599, newPrice: 179, discount: 70, cashback: 6, emoji: "🦋", popular: false },
+            { id: 8, title: "Disco Elysium", oldPrice: 1499, newPrice: 449, discount: 70, cashback: 5, emoji: "🕵️", popular: false }
+        ];
+
+        // ===== ФУНКЦИЯ СОЗДАНИЯ КАРТОЧКИ ИГРЫ =====
+        function createGameCard(game) {
+            const card = document.createElement('div');
+            card.className = 'game-card';
+            card.innerHTML = `
+                <div class="game-cover">
+                    ${game.emoji}
+                    ${game.discount > 0 ? `<div class="discount-badge">-${game.discount}%</div>` : ''}
+                </div>
+                <div class="game-info">
+                    <div class="game-title">${game.title}</div>
+                    <div class="game-prices">
+                        <span class="old-price">${game.oldPrice} ₽</span>
+                        <span class="new-price">${game.newPrice} ₽</span>
+                    </div>
+                    <div class="cashback">💰 Кешбэк: ${game.cashback}%</div>
+                    <button class="btn-wishlist" data-id="${game.id}">➕ В список желаемого</button>
+                </div>
+            `;
+            return card;
+        }
+
+        // ===== ОТРИСОВКА КАРТОЧЕК =====
+        function renderGames(containerId, filterFn) {
+            const container = document.getElementById(containerId);
+            container.innerHTML = '';
+            const filtered = games.filter(filterFn);
+            filtered.forEach(game => {
+                const card = createGameCard(game);
+                container.appendChild(card);
+            });
+        }
+
+        // ===== ПЕРВОНАЧАЛЬНАЯ ОТРИСОВКА =====
+        // Скидки дня — это игры со скидкой 60% и выше
+        renderGames('gamesGrid', g => g.discount >= 60);
+        // Популярные — это игры с флагом popular
+        renderGames('popularGrid', g => g.popular);
+
+        // ===== ОБРАБОТКА КНОПКИ "В СПИСОК ЖЕЛАЕМОГО" =====
+        document.addEventListener('click', function(e) {
+            if (e.target.classList.contains('btn-wishlist')) {
+                const btn = e.target;
+                const gameId = btn.dataset.id;
+                const game = games.find(g => g.id == gameId);
+
+                if (btn.classList.contains('added')) {
+                    btn.classList.remove('added');
+                    btn.textContent = '➕ В список желаемого';
+                    showToast(`"${game.title}" удалена из списка`);
+                } else {
+                    btn.classList.add('added');
+                    btn.textContent = '✔ В списке желаемого';
+                    showToast(`"${game.title}" добавлена в список`);
+                }
+            }
+        });
+
+        // ===== ПОИСК ИГР =====
+        document.getElementById('searchInput').addEventListener('input', function(e) {
+            const query = e.target.value.trim().toLowerCase();
+
+            if (query.length === 0) {
+                // Если поиск пуст — показываем обычные блоки
+                renderGames('gamesGrid', g => g.discount >= 60);
+                renderGames('popularGrid', g => g.popular);
+                document.querySelectorAll('.section-title')[0].textContent = '🔥 Лучшие скидки дня';
+                document.querySelectorAll('.section-title')[1].textContent = '🎮 Популярные игры';
+                return;
+            }
+
+            // Фильтруем все игры по названию
+            const results = games.filter(g => g.title.toLowerCase().includes(query));
+
+            // Показываем результаты в первом блоке
+            const container = document.getElementById('gamesGrid');
+            container.innerHTML = '';
+
+            if (results.length === 0) {
+                container.innerHTML = '<p style="color:#888;">Ничего не найдено. Попробуйте другое название.</p>';
+            } else {
+                results.forEach(game => {
+                    const card = createGameCard(game);
+                    container.appendChild(card);
+                });
+            }
+
+            // Меняем заголовки
+            document.querySelectorAll('.section-title')[0].textContent = `🔍 Результаты поиска: "${query}"`;
+            document.querySelectorAll('.section-title')[1].textContent = '';
+
+            // Очищаем второй блок
+            document.getElementById('popularGrid').innerHTML = '';
+        });
+
+        // ===== ВСПЛЫВАЮЩЕЕ УВЕДОМЛЕНИЕ =====
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.classList.add('show');
+
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 2500);
+        }
+    </script>
+
+</body>
+</html>
