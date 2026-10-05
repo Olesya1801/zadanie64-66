@@ -28,5 +28,5 @@ jobs:
           context: .
           push: true
           tags: |
-            ghcr.io/${{ github.repository }}:latest
-            ghcr.io/${{ github.repository }}:${{ github.sha }}
+            ghcr.io/olesya1801/zadanie64-66:latest
+            ghcr.io/olesya1801/zadanie64-66:${{ github.sha }}
